@@ -1,168 +1,130 @@
+" Fundamentals
+" ---------------------------------------------------------------------
+" init autocmd
+autocmd!
+" set script encoding
+scriptencoding utf-8
+" stop loading config if it's on tiny or small
+if !1 | finish | endif
+
 set nocompatible
-set showmatch
-set ignorecase
-set mouse=v
-set hlsearch
-set incsearch
-set tabstop=4
-set softtabstop=2
-set expandtab
-set shiftwidth=4
-set autoindent
 set number
-set wildmode=longest, list
-set cc=80
-filetype plugin indent on
-syntax on
-set title
-set laststatus=2
-set shell=zsh
-set mouse=a
-set clipboard=unnamedplus
-filetype plugin on
-set cursorline
-set ttyfast
-set nobackup
-set scrolloff=10
-
-call plug#begin("~/.vim/plugged")
- " Plugin Section
- " Themes
- Plug 'dracula/vim'
- Plug 'projekt0n/github-nvim-theme'
- Plug 'ryanoasis/vim-devicons'
- " Plug 'SirVer/ultisnips'
- Plug 'honza/vim-snippets'
- Plug 'scrooloose/nerdtree'
- Plug 'preservim/nerdcommenter'
- Plug 'mhinz/vim-startify'
- Plug 'neoclide/coc.nvim', {'branch': 'release'}
- Plug 'windwp/nvim-autopairs'
- Plug 'kristijanhusak/defx-git'
- Plug 'kristijanhusak/defx-icons'  
- " Go packages
- Plug 'fatih/vim-go', {'do': ':GoUpdateBinaries'}
- Plug 'nvim-lua/plenary.nvim'
- Plug 'nvim-lua/popup.nvim'
- Plug 'crispgm/nvim-go', {'branch': 'main'}
- " Recommended plugin LSP Config
- Plug 'neovim/nvim-lspconfig'
- " Vue packages
- Plug 'leafOfTree/vim-vue-plugin'
- " Typescript packages
- Plug 'jose-elias-alvarez/null-ls.nvim', {'branch': 'main'}
- Plug 'jose-elias-alvarez/nvim-lsp-ts-utils', {'branch': 'main'}
-call plug#end()
-
-" Color schemes
-if (has("termguicolors"))
-  set termguicolors
-endif
 syntax enable
+" set fileencodings=utf-8,sjis,euc-jp,latin
+set encoding=utf-8
+set title
+set autoindent
+set background=dark
+set nobackup
+set hlsearch
+set showcmd
+set cmdheight=1
+set laststatus=2
+set scrolloff=10
+set expandtab
+"let loaded_matchparen = 1
+set shell=powershell
 
-" Color scheme evening
-colorscheme github_dark
-
-" Open new split panes to right and below
-set splitright
-set splitbelow
-
-" Move line or visually selected block - alt+j/k
-inoremap <A-j> <Esc>:m .+1<CR>==gi
-inoremap <A-k> <Esc>:m .-2<CR>==gi
-vnoremap <A-j> :m '>+1<CR>gv=gv
-vnoremap <A-k> :m '<-2<CR>gv=gv
-
-" Move split panes to left/bottom/top/right
-nnoremap <A-h> <C-W>H
-nnoremap <A-j> <C-W>J
-nnoremap <A-k> <C-W>K
-nnoremap <A-l> <C-W>L
-
-" Move between panes to left/bottom/top/right
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
-
-" Press i to entre insert mde, and ii to exit it
-:inoremap ii <Esc>
-:inoremap jk <Esc>
-:inoremap kj <Esc>
-:vnoremap jk <Esc>
-:vnoremap kj <Esc>
-
-" Open file in a text by placinf text and gf
-nnoremap gf :vert winc f<cr>
-
-" Copies filepath to clipboard by pressing yf
-:nnoremap <silent> yf :let @+=expand('%:p')<CR>
-
-" Copies pwd to clipboard: command yd
-:nnoremap <silent> yd :let @+expand('%:p:h')<CR>
-
-" Vim jump to the last position when reoening a file
-if has("autocmd")
-    au BufReadPost * if line("'\"") > 0 && line("'\"") <= line ("£")
-                \| exe"normal! g'\"" | endif
+" incremental substitution (neovim)
+if has('nvim')
+  set inccommand=split
 endif
 
-" Lua settings
+set nosc noru nosm
+" Don't redraw while executing macros (good performance config)
+set lazyredraw
+"set showmatch
+" How many tenths of a second to blink when matching brackets
+"set mat=2
+" Ignore case when searching
+set ignorecase
+" Be smart when using tabs ;)
+set smarttab
+" indents
+filetype plugin indent on
+set shiftwidth=2
+set tabstop=2
+set ai "Auto indent
+set si "Smart indent
+set nowrap "No Wrap lines
+set backspace=start,eol,indent
+" Finding files - Search down into subfolders
+set path+=**
+set wildignore+=*/node_modules/*
+
+
+" Highlights
+" ---------------------------------------------------------------------
+" set cursorline
+set cursorcolumn
+
+" Set cursor line color on visual mode
+highlight Visual cterm=NONE ctermbg=236 ctermfg=NONE guibg=Grey40
+
+highlight LineNr cterm=none ctermfg=240 guifg=#2b506e guibg=#000000
+
+augroup BgHighlight
+  autocmd!
+  autocmd WinEnter * set cul
+  autocmd WinLeave * set nocul
+augroup END
+
+if &term =~ "screen"
+  autocmd BufEnter * if bufname("") !~ "^?[A-Za-z0-9?]*://" | silent! exe '!echo -n "\ek[`hostname`:`basename $PWD`/`basename %`]\e\\"' | endif
+  autocmd VimLeave * silent!  exe '!echo -n "\ek[`hostname`:`basename $PWD`]\e\\"'
+endif
+
+
+" File types
+" ---------------------------------------------------------------------
+" JavaScript
+au BufNewFile,BufRead *.es6 setf javascript
+" TypeScript
+au BufNewFile,BufRead *.tsx setf typescriptreact
+" Markdown
+au BufNewFile,BufRead *.md set filetype=markdown
+au BufNewFile,BufRead *.mdx set filetype=markdown
+" Flow
+au BufNewFile,BufRead *.flow set filetype=javascript
+" Fish
+au BufNewFile,BufRead *.fish set filetype=fish
+
+set suffixesadd=.js,.es,.jsx,.json,.css,.less,.sass,.styl,.php,.py,.md
+
+autocmd FileType coffee setlocal shiftwidth=2 tabstop=2
+autocmd FileType ruby setlocal shiftwidth=2 tabstop=2
+autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
+
+
+" Syntax theme "
+" ---------------------------------------------------------------------
+" true color
+if exists("&termguicolors")
+  syntax enable
+  "set termguicolors
+  "set winblend=0
+  "set wildoptions=pum
+  "set pumblend=5
+  set background=dark
+  " Use NeoSolarized
+  let g:neosolarized_termtrans=1
+  runtime ./colors/NeoSolarized.vim
+  colorscheme NeoSolarized
+endif
+
+" Plugins call install with vim-plug
+" ---------------------------------------------------------------------
+runtime ./plug.vim
+
+" Lua
+" ---------------------------------------------------------------------
 lua << EOF
-
-local lspconfig = require("lspconfig")
-local null_ls = require("null-ls")
-local buf_map = function(bufnr, mode, lhs, rhs, opts)
-    vim.api.nvim_buf_set_keymap(bufnr, mode, lhs, rhs, opts or {
-        silent = true,
-    })
-end
-local on_attach = function(client, bufnr)
-    vim.cmd("command! LspDef lua vim.lsp.buf.definition()")
-    vim.cmd("command! LspFormatting lua vim.lsp.buf.formatting()")
-    vim.cmd("command! LspCodeAction lua vim.lsp.buf.code_action()")
-    vim.cmd("command! LspHover lua vim.lsp.buf.hover()")
-    vim.cmd("command! LspRename lua vim.lsp.buf.rename()")
-    vim.cmd("command! LspRefs lua vim.lsp.buf.references()")
-    vim.cmd("command! LspTypeDef lua vim.lsp.buf.type_definition()")
-    vim.cmd("command! LspImplementation lua vim.lsp.buf.implementation()")
-    vim.cmd("command! LspDiagPrev lua vim.diagnostic.goto_prev()")
-    vim.cmd("command! LspDiagNext lua vim.diagnostic.goto_next()")
-    vim.cmd("command! LspDiagLine lua vim.diagnostic.open_float()")
-    vim.cmd("command! LspSignatureHelp lua vim.lsp.buf.signature_help()")
-    buf_map(bufnr, "n", "gd", ":LspDef<CR>")
-    buf_map(bufnr, "n", "gr", ":LspRename<CR>")
-    buf_map(bufnr, "n", "gy", ":LspTypeDef<CR>")
-    buf_map(bufnr, "n", "K", ":LspHover<CR>")
-    buf_map(bufnr, "n", "[a", ":LspDiagPrev<CR>")
-    buf_map(bufnr, "n", "]a", ":LspDiagNext<CR>")
-    buf_map(bufnr, "n", "ga", ":LspCodeAction<CR>")
-    buf_map(bufnr, "n", "<Leader>a", ":LspDiagLine<CR>")
-    buf_map(bufnr, "i", "<C-x><C-x>", "<cmd> LspSignatureHelp<CR>")
-    if client.resolved_capabilities.document_formatting then
-        vim.cmd("autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()")
-    end
-end
-lspconfig.tsserver.setup({
-    on_attach = function(client, bufnr)
-        client.resolved_capabilities.document_formatting = false
-        client.resolved_capabilities.document_range_formatting = false
-        local ts_utils = require("nvim-lsp-ts-utils")
-        ts_utils.setup({})
-        ts_utils.setup_client(client)
-        buf_map(bufnr, "n", "gs", ":TSLspOrganize<CR>")
-        buf_map(bufnr, "n", "gi", ":TSLspRenameFile<CR>")
-        buf_map(bufnr, "n", "go", ":TSLspImportAll<CR>")
-        on_attach(client, bufnr)
-    end,
-})
-null_ls.setup({
-    sources = {
-        null_ls.builtins.diagnostics.eslint,
-        null_ls.builtins.code_actions.eslint,
-        null_ls.builtins.formatting.prettier,
-    },
-    on_attach = on_attach,
-})
-
+require'lspconfig'.tsserver.setup{}
+require'lspconfig'.volar.setup{
+  filetypes = {'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'json'}
+}
+require'lspconfig'.gopls.setup{}
+require'lspconfig'.dockerls.setup{}
+require'lspconfig'.bashls.setup{}
+require'lspconfig'.pyright.setup{}
 EOF
